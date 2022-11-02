@@ -29,19 +29,22 @@ def run_config(task_names, task_dict, n_folds, config):
             score = []
             time_fit = []
             time_predict = []
+            time_compile = []
             for r in result:
                 score.append(r['test_score'])
                 time_fit.append(r['time_fit'])
                 time_predict.append(r['time_predict'])
+                time_compile.append(r['time_compile'])
             score = float(np.mean(score))
             time_fit = float(np.mean(time_fit))
             time_predict = float(np.mean(time_predict))
-            print(f'{task_name} score: {round(score, 5)}, time_fit: {round(time_fit, 2)}s, time_predict: {round(time_predict, 4)}s')
+            time_compile = float(np.mean(time_compile))
+            print(f'{task_name} score: {round(score, 5)}, time_fit: {round(time_fit, 2)}s, time_predict: {round(time_predict, 4)}s, time_compile: {round(time_compile, 4)}s')
 
     from collections import defaultdict
 
     df = defaultdict(list)
-    cols = ['test_score', 'time_fit', 'time_predict', 'eval_metric', 'test_error', 'fold', 'repeat', 'sample', 'task_id', 'problem_type']
+    cols = ['test_score', 'time_fit', 'time_predict', 'time_compile', 'eval_metric', 'test_error', 'fold', 'repeat', 'sample', 'task_id', 'problem_type']
     for task_name, task_result in score_dict.items():
         is_valid = task_result['is_valid']
         if is_valid:
@@ -78,15 +81,18 @@ if __name__ == "__main__":
     print(task_names)
 
     config1 = dict(
-        name='NN_TORCH',
+        name='RF-native',
         fit_args={
-            'hyperparameters': {'NN_TORCH': {}},
+            'hyperparameters': {'RF': {}},
         },
     )
     config2 = dict(
-        name='XGB',
+        name='RF-onnx',
         fit_args={
-            'hyperparameters': {'XGB': {}},
+            'hyperparameters': {'RF': {}},
+        },
+        compile_args={
+            'compiler_configs': {"compiler": "onnx"}
         }
     )
 
