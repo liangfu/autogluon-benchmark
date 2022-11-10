@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, "/home/liangfc/workspace/autogluon-benchmark")
 
 import numpy as np
 import pandas as pd
@@ -74,25 +76,25 @@ if __name__ == "__main__":
     task_dict = task_loader.get_task_dict(['ag_tiny.yaml'])
 
     n_folds = [0]
-    num_datasets = 10
+    num_datasets = 20
 
     print(len(task_dict.keys()))
     task_names = list(task_dict.keys())[:num_datasets]
     print(task_names)
 
     config1 = dict(
-        name='RF-native',
+        name='NN_TORCH-native',
         fit_args={
-            'hyperparameters': {'RF': {}},
+            'hyperparameters': {'NN_TORCH': {}},
         },
     )
     config2 = dict(
-        name='RF-onnx',
+        name='NN_TORCH-tvm',
         fit_args={
-            'hyperparameters': {'RF': {}},
+            'hyperparameters': {'NN_TORCH': {}},
         },
         compile_args={
-            'compiler_configs': {"compiler": "onnx"}
+            'compiler_configs': {"NeuralNetTorch": {"compiler": "tvm"}}
         }
     )
 
@@ -103,7 +105,7 @@ if __name__ == "__main__":
 
     df_final = run_configs(task_names=task_names, task_dict=task_dict, n_folds=n_folds, configs=configs)
 
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 1000):
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 1000, 'display.float_format', '{:.6f}'.format):
         print(df_final)
 
     save_path_df = save_path_prefix + 'result.csv'
